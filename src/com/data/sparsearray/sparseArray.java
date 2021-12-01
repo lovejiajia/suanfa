@@ -1,4 +1,4 @@
-package com.data;
+package com.data.sparsearray;
 
 //稀疏数组(五子棋)
 public class sparseArray {
