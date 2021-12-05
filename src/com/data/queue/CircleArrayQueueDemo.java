@@ -2,13 +2,12 @@ package com.data.queue;
 
 import java.util.Scanner;
 
-//数组模拟队列
-public class ArrayQueueDemo {
-
+//数组模拟环形队列
+public class CircleArrayQueueDemo {
     public static void main(String[] args) {
         //测试
         //创建一个队列
-        ArrayQueue queue = new ArrayQueue(5);
+        CircleArrayQueue queue = new CircleArrayQueue(5);
         char key = ' '; //接收用户输入
         Scanner scanner = new Scanner(System.in);//
         boolean loop = true;
@@ -58,67 +57,65 @@ public class ArrayQueueDemo {
     }
 }
 
-//使用数组模拟队列
-class ArrayQueue {
+class CircleArrayQueue {
     private int maxSize;//最大容量
     private int front;//前部
     private int rear;//后部
-    private int arr[];//储存数据
+    private int arr[];//数组储存数据
 
-    //初始化队列
-    ArrayQueue (int arrMaxSize){
-        maxSize = arrMaxSize;
-        front = -1;
-        rear = -1;
+    //初始化(前部和后部默认为0)
+    CircleArrayQueue(int arrSize) {
+        maxSize = arrSize;
         arr = new int[maxSize];
     }
 
-    //判断队列是否已满
-    public boolean isFull (){
-        return rear == maxSize - 1;
-    }
-    //判断队列是否为空
-    public boolean isEmpty(){
-        return rear == front;
+    //判断是否为空
+    public boolean isEmpty() {
+        return front == rear;
     }
 
-    //添加数据(进队列)
-    public void addQueue (int data){
-        if (isFull()){
-            System.out.println("队列已满，请稍后尝试");
-        } else {
-            rear++;
-            arr[rear] = data;
-        }
+    //判断是否已满
+    public boolean isFull() {
+        return (rear + 1) % maxSize == front;
     }
 
-    //获取数据(出队列)
-    public int getQueue (){
-        if (isEmpty()){
+    //出队列
+    public int getQueue() {
+        if (isEmpty()) {
             throw new RuntimeException("队列为空");
         } else {
-            front++;
+            front = (front + 1) % maxSize;
             return arr[front];
         }
     }
 
-    //显示所有数据
+    //入队列
+    public void addQueue(int data) {
+        if (isFull()) {
+            System.out.println("队列已满");
+        } else {
+            arr[rear] = data;
+            rear = (rear + 1) % maxSize;
+        }
+    }
+
+    //获取队列全部数据
     public void showQueue (){
         if (isEmpty()){
             throw new RuntimeException("队列为空");
         } else {
-            for (int i = 0; i < arr.length; i++){
+            for (int i = front; i != rear; i++){
                 System.out.println(arr[i]);
             }
         }
     }
 
-    //显示头部数据(非出队列)
+    //获取队列首个数据
     public void showFristQueue (){
         if (isEmpty()){
             throw new RuntimeException("队列为空");
         } else {
-            System.out.println("第一个数据为" + arr[front+1]);
+            System.out.println(arr[front]);
         }
     }
 }
