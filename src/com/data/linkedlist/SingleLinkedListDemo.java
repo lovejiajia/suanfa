@@ -1,5 +1,7 @@
 package com.data.linkedlist;
 
+import java.util.Stack;
+
 public class SingleLinkedListDemo{
     public static void main(String[] args) {
 
@@ -15,9 +17,15 @@ public class SingleLinkedListDemo{
         sll.add(node4);
         System.out.println("测试添加");
         sll.list();
+        System.out.println("测试反向输出,不改变结构");
+        sll.reverseListByStack(sll.getNode());
+        System.out.println("测试反向输出,不改变结构(递归)");//递归传入值不能有空节点
+        sll.reverseListByRecursion(sll.getNode().getNext());
         System.out.println("测试倒数第几位");
         Node indexNode = sll.getByIndex(sll.getNode(), 1);
         System.out.println("倒数第一个为: " + indexNode);
+
+
 
         //测试按顺序
         SingleLinkedList sll1 = new SingleLinkedList();
@@ -172,7 +180,7 @@ class SingleLinkedList {
         return length;
     }
 
-    //查找单链表中的倒数第k个结点 【新浪面试题】
+    //查找单链表中的倒数第k个结点
     public Node getByIndex(Node node, int index){
         if (node.getNext() == null){
             System.out.println("链表为空");
@@ -187,6 +195,31 @@ class SingleLinkedList {
             res = res.getNext();
         }
         return res;
+    }
+
+    //从尾到头打印单链表(方法1:使用栈)
+    public void reverseListByStack(Node node){
+        Stack<Node> stack = new Stack();
+        Node next = node.getNext();
+        //入栈
+        while (next != null){
+            stack.push(next);
+            next = next.getNext();
+        }
+        //出栈
+        while (!stack.isEmpty()){
+            System.out.println(stack.pop());
+        }
+    }
+
+    //从尾到头打印单链表(方法2:使用递归)
+    public void reverseListByRecursion(Node node){
+        if (node != null){
+            if(node.getNext() != null){
+                reverseListByRecursion(node.getNext());
+            }
+            System.out.println(node);
+        }
     }
 }
 
