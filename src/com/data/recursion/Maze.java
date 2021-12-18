@@ -1,5 +1,6 @@
 package com.data.recursion;
 
+//递归
 public class Maze {
 
     public static void main(String[] args) {
