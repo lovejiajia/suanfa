@@ -13,6 +13,10 @@ import java.util.Date;
  *
  * 最佳情况：T(n) = O(nlog2 n)  最坏情况：T(n) = O(nlog2 n)  平均情况：T(n) =O(nlog2n)
  *
+ * 希尔算法:把数组按length/2分割，每次用第n个元素和第n+gap个元素进行比较，小则向前，比较一圈后，gap/2，
+ * 在按用第n个元素和第n+gap个元素进行比较，依次循环，
+ * 直到gap为1时，进行最后一次，挨个比较
+ * **(length/2)中，2可以替换成其他数字，建议使用2，**
  */
 public class ShellSort {
 
@@ -43,6 +47,24 @@ public class ShellSort {
                 while (preIndex >= 0 && arr[preIndex] > temp){
                     arr[preIndex + gap] = arr[preIndex];
                     preIndex -= gap;
+                }
+                arr[preIndex + gap] = temp;
+            }
+            gap /= 2;
+        }
+    }
+
+
+    public static void shell(int[] arr){
+        int length = arr.length;
+        int temp,gap = length / 2;
+        while (gap > 0){
+            for (int i = gap; i < length; i++){
+                temp = arr[i];
+                int preIndex = i - gap;
+                while (preIndex >= 0 && arr[preIndex] > temp){
+                    arr[preIndex + gap] = arr[preIndex];//和插入排序一样，把大的数值，赋值给后面，小的数值，进入比较区，直到为大数值为止
+                    preIndex -= gap;//使之变为负数
                 }
                 arr[preIndex + gap] = temp;
             }
