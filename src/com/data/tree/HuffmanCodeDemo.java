@@ -2,6 +2,9 @@ package com.data.tree;
 
 import java.util.*;
 
+/**
+ * 赫夫曼编码解码
+ */
 public class HuffmanCodeDemo {
     public static void main(String[] args) {
         String content = "i like like like java do you like a java";
@@ -18,6 +21,8 @@ public class HuffmanCodeDemo {
         //
         // System.out.println("原来的字符串=" + new String(sourceBytes));
          // "i like like like java do you like a java"
+        byte[] sourceBytes = upzipHuffman(huffmanCodesBytes);
+        System.out.println("原来的字符串=" + new String(sourceBytes));
     }
 
 
@@ -142,6 +147,75 @@ public class HuffmanCodeDemo {
         Map<Byte, String> map = getCodes(root);//3.通过赫夫曼树，获取赫夫曼编码(左0，右1，路径为，该字符的编码)
         byte[] b = zip(bytes, map);//4.通过赫夫曼编码，将原始数据，转化为以byte类型储存
         return b;
+    }
+
+    /**
+     * 解码
+     * @param huffmanBytes          压缩后的
+     * @return
+     */
+    public static byte[] upzipHuffman(byte[] huffmanBytes){
+        //1. 先得到 huffmanBytes 对应的 二进制的字符串 ， 形式 1010100010111...
+        StringBuilder stringBuilder = new StringBuilder();
+        //将byte数组转成二进制的字符串
+        for(int i = 0; i < huffmanBytes.length; i++) {
+            byte b = huffmanBytes[i];
+            //判断是不是最后一个字节
+            boolean flag = (i == huffmanBytes.length - 1);
+            stringBuilder.append(byteToBitString(!flag, b));
+        }
+        //将赫夫曼编码反转，key为编码，value为字符
+        Map<String, Byte> map = new HashMap<>();
+        for (Map.Entry<Byte, String> m : huffmanCodes.entrySet()){
+            map.put(m.getValue(), m.getKey());
+        }
+        //循环二进制字符串
+        List<Byte> list = new ArrayList<>();//用于保存字符
+        for (int i = 0; i < stringBuilder.length();){
+            Byte b = null;
+            boolean flag = true;
+            int count = 1;//计数
+            while (flag){
+                String s = stringBuilder.substring(i, i + count);
+                b = map.get(s);
+                if (b == null){
+                    count++;
+                } else {
+                    flag = false;
+                }
+            }
+            list.add(b);
+            i += count;
+        }
+        //list转化为byte数组类型返回
+        byte[] b = new byte[list.size()];
+        for (int i = 0; i < b.length; i++){
+            b[i] = list.get(i);
+        }
+        return b;
+    }
+
+    /**
+     * 将一个byte 转成一个二进制的字符串,
+     * @param b 传入的 byte
+     * @param flag 标志是否需要补高位如果是true ，表示需要补高位，如果是false表示不补, 如果是最后一个字节，无需补高位
+     * @return 是该b 对应的二进制的字符串，（注意是按补码返回）
+     */
+    private static String byteToBitString(boolean flag, byte b) {
+        //使用变量保存 b
+        int temp = b; //将 b 转成 int
+        //最后一个字节，无需补高位
+        if(flag) {
+            //如果是正数我们还存在补高位
+            temp |= 256; //按位与 256  1 0000 0000  | 0000 0001 => 1 0000 0001
+        }
+        String str = Integer.toBinaryString(temp); //返回的是temp对应的二进制的补码
+        if(flag) {
+            //返回后8位
+            return str.substring(str.length() - 8);
+        } else {
+            return str;
+        }
     }
 
 }

@@ -1,5 +1,8 @@
 package com.data.tree;
 
+/**
+ * 线索化二叉树
+ */
 public class ThreadTreeDemo {
     public static void main(String[] args) {
         //创建需要的结点

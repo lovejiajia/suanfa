@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 赫夫曼树
+ */
 public class HuffmanTreeDemo {
     public static void main(String[] args) {
         int arr[] = { 13, 7, 8, 3, 29, 6, 1 };
