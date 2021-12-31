@@ -300,24 +300,6 @@ class RedBlackTree{
 
 }
 class TreeOperation1 {
-
-    /**
-     * ClassName: TestRBTree
-     * Description:
-     * date: 2020/1/12 16:07
-     *
-     * @author 巍巍老师
-     * @since 1.0.0
-     */
-      /*
-    树的结构示例：
-              1
-            /   \
-          2       3
-         / \     / \
-        4   5   6   7
-    */
-
     // 用于获得树的层数
     public static int getTreeDepth(RedBlackTree.Node5 root) {
         return root == null ? 0 : (1 + Math.max(getTreeDepth(root.getLeft()), getTreeDepth(root.getRight())));
