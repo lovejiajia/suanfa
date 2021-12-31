@@ -5,12 +5,12 @@ package com.data.tree;
  */
 public class BinaryALVTreeDemo {
     public static void main(String[] args) {
-        int[] arr = { 10, 11, 7, 6, 8, 9 };
+        int[] arr = { 10, 11, 7, 8, 9,12,13,5,4,3,2,1,16,18,19,20,21,23,25,27 };
         //创建一个 AVLTree对象
         AVLTree avlTree = new AVLTree();
         //添加结点
         for(int i=0; i < arr.length; i++) {
-            avlTree.add(new Node5(arr[i]));
+            avlTree.add(new ALVNode(arr[i]));
         }
 
         //遍历
@@ -26,14 +26,14 @@ public class BinaryALVTreeDemo {
 }
 
 class AVLTree {
-    private Node5 root;
+    private ALVNode root;
 
     //获取root节点
-    public Node5 getRoot(){
+    public ALVNode getRoot(){
         return root;
     }
     //添加
-    public void add(Node5 node){
+    public void add(ALVNode node){
         if (root == null){
             root = node;
         } else {
@@ -52,8 +52,8 @@ class AVLTree {
 
 class ALVNode{
     int value;
-    Node5 left;
-    Node5 right;
+    ALVNode left;
+    ALVNode right;
 
     public ALVNode(int value) {
         this.value = value;
@@ -66,7 +66,7 @@ class ALVNode{
                 '}';
     }
 
-    public void add(Node5 node){
+    public void add(ALVNode node){
         if (this.value > node.value){
             if (this.left == null){
                 this.left = node;
@@ -133,7 +133,7 @@ class ALVNode{
     //左旋转
     public void leftRotate(){
         //旋转后的节点顺序
-        Node5 newNode = new Node5(value);
+        ALVNode newNode = new ALVNode(value);
         newNode.left = left;
         newNode.right = right.left;
         //修改root节点
@@ -145,7 +145,7 @@ class ALVNode{
     //右旋转
     public void rightRotate(){
         //旋转后的节点顺序
-        Node5 newNode = new Node5(value);
+        ALVNode newNode = new ALVNode(value);
         newNode.left = left.right;
         newNode.right = right;
         //修改root节点
