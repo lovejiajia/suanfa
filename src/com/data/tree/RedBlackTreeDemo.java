@@ -13,17 +13,6 @@ import java.util.Scanner;
  */
 public class RedBlackTreeDemo {
     public static void main(String[] args) {
-        int[] arr = { 10, 11, 7, 8, 9,12,13,5,4,3,2,1,16,18,19,20,21,23,25,27 };
-        //创建一个 AVLTree对象
-        RedBlackTree tree = new RedBlackTree();
-        //添加结点
-        for(int i=0; i < arr.length; i++) {
-            tree.add(new RedBlackTree.Node5(arr[i]));
-        }
-        System.out.println("已添加完毕");
-        TreeOperation1.show(tree.getRoot());
-
-
         RedBlackTree tree1 = new RedBlackTree();
         while(true) {
             Scanner sc = new Scanner(System.in);
