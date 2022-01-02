@@ -3,9 +3,12 @@ package com.data.tree;
 import java.util.Scanner;
 
 /**
- * 红黑树
+ * 红黑树(2022.1.2)
+ * 参考:https://blog.csdn.net/weixin_41563161/article/details/104452601?ops_request_misc=&request_id=&biz_id=102&utm_term=%E7%BA%A2%E9%BB%91%E6%A0%91%E5%88%A0%E9%99%A4java&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-3-104452601.nonecase&spm=1018.2226.3001.4187
+ *     https://blog.csdn.net/qq_41885278/article/details/104901078?spm=1001.2101.3001.6650.3&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-3.no_search_link&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7Edefault-3.no_search_link&utm_relevant_index=3
+ *     https://blog.csdn.net/victoryyounger/article/details/112109261?ops_request_misc=&request_id=&biz_id=102&utm_term=%E7%BA%A2%E9%BB%91%E6%A0%91%E5%88%A0%E9%99%A4java&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-4-112109261.nonecase&spm=1018.2226.3001.4187
  * 增加已完成
- * 删除以后完成
+ * 删除已完成
  * 左旋转、右旋转，记得改颜色
  */
 public class RedBlackTreeDemo {
@@ -26,6 +29,13 @@ public class RedBlackTreeDemo {
             Scanner sc = new Scanner(System.in);
             System.out.println("请输入key:");
             String key = sc.next();
+            if (Integer.parseInt(key) == 0){
+                System.out.println("请输入删除key:");
+                key = sc.next();
+                tree1.del(Integer.parseInt(key));
+                TreeOperation1.show(tree1.getRoot());
+                continue;
+            }
 
             tree1.add(new RedBlackTree.Node5(Integer.parseInt(key)));
             TreeOperation1.show(tree1.getRoot());
@@ -230,7 +240,239 @@ class RedBlackTree{
         //执行修复方法
         insertFIxUp(node);
     }
-  static class Node5{
+    public Node5 delMix(Node5 node){
+        while (node.left != null){
+            node = node.left;
+        }
+        return node;
+    }
+    private Node5 getKey(int key) {
+        Node5 temp = this.root;
+        while (temp != null) {
+            if (temp.key > key) {
+                temp = temp.left;
+            } else if (temp.key < key) {
+                temp = temp.right;
+            } else {
+                return temp;
+            }
+        }
+        return null;
+    }
+
+    /**删除节点
+     *  1.没有节点，直接删除
+     *  2.有一个节点，子节点和次节点互换，删除子节点
+     *  3.有两个节点，找到后继节点，互换，删除后继节点
+     * 总结:删除的节点都没有子节点
+     * @param key
+     */
+    //删除
+    public void del(int key){
+        Node5 node = getKey(key);
+        if (node == null){
+            System.out.println("节点不存在");
+        }
+        if (node == root){
+            root = null;
+        } else {
+            //有两个节点，找到后继节点
+            if (node.left != null && node.right != null){
+                Node5 temp = delMix(node.right);
+                node.key = temp.key;
+                //删除节点变为后继节点
+                node = temp;
+            }
+            //有一个节点，或没有节点
+            Node5 temp = node.left == null ? node.right : node.left;
+            if (temp != null){
+                node.key = temp.key;
+            } else {
+                temp = node;
+            }
+            //修复红黑树，传入实际删除节点
+            deleteLeafFix(temp);
+            Node5 parent = parentOf(temp);
+            //删除父子节点关系
+            if (parent.left == temp) {
+                parent.left = null;
+            } else {
+                parent.right = null;
+            }
+            temp.parent = null;
+        }
+    }
+
+
+    /** 红黑树删除修复(兄弟节点指为黑的兄弟节点，兄弟节点为红，父、兄换色，父旋转，即可得到兄弟节点为黑)
+     * 按删除节点为父节点的左右，分为两种情况
+     *  按删除节点及删除节点兄弟节点的情况分为以下3种情况
+     *  1.可自行调整（删除节点为红）
+     *  2.找兄弟节点借(兄弟节点有子节点)
+     *      1.RL、LR情况，先换色，在旋转，即可得到RR、LL
+     *      2.RR、LL（兄、父、兄左变色，父旋转）
+     *  3.兄弟节点不借(兄弟节点没有子节点)
+     *          兄弟节点变红，从父节点开始循环
+     *              1.父节点有红，红变黑
+     *              2.父节点没有红，跟节点的兄弟节点黑减1(跟节点、兄弟节点变色，跟节点旋转)
+     * @param node
+     */
+    private void deleteLeafFix(Node5 node) {
+        while (node != root && node.color == BLACK){
+            Node5 parent = parentOf(node); //父节点
+            //删除节点为父节点的左子节点
+            if (parent.left == node){
+                Node5 brother = parent.right;
+                //兄弟节点为红色，其父、子节点必为黑,把兄弟节点改黑(父兄互换色，父旋转)
+                if (brother.color == RED){
+                    parent.color = RED;
+                    brother.color = BLACK;
+                    leftRotate(parent);
+                    brother = parent.right;
+                }
+                //3.兄弟不借，兄弟没有子节点(向上递归，直到跟节点或者红色节点)
+                if (brother.left == null && brother.right == null){
+                    brother.color = RED;
+                    node = parent;
+                    //循环到跟节点或者红色节点
+                    while (node != root && node.color == BLACK){
+                        node = node.parent;
+                    }
+                    //跟节点，变色，旋转
+                    if (node == root){
+                        node.color = RED;
+                        leftRotate(node);
+                    //红色节点，变黑色
+                    } else {
+                        node.color = BLACK;
+                        node = root;
+                    }
+                //2.兄弟有借,兄弟节点有子节点
+                } else {
+                    //兄弟节点没有右节点，兄、兄左换色，兄右旋
+                    if (brother.right == null){
+                        brother.color = RED;
+                        brother.left.color = BLACK;
+                        rightRotate(brother);
+                        brother = parent.right;
+                    }
+                    brother.color = parent.color;
+                    parent.color = BLACK;
+                    brother.right.color = BLACK;
+                    leftRotate(parent);
+                    node = root;
+                }
+            //删除节点为父节点的右子节点
+            }else {
+                Node5 brother = parent.left;
+                //兄弟节点为红色，其父、子节点必为黑,把兄弟节点改黑(父兄互换色，父旋转)
+                if (brother.color == RED){
+                    parent.color = RED;
+                    brother.color = BLACK;
+                    rightRotate(parent);
+                    brother = parent.left;
+                }
+                //3.兄弟无借，兄弟没有子节点
+                if (brother.left == null && brother.right == null){
+                    brother.color = RED;
+                    node = parent;
+                    //循环到跟节点或者红色节点
+                    while (node != root && node.color == BLACK){
+                        node = node.parent;
+                    }
+                    //跟节点，变色，旋转
+                    if (node == root){
+                        node.color = RED;
+                        rightRotate(node);
+                        //红色节点，变黑色
+                    } else {
+                        node.color = BLACK;
+                        node = root;
+                    }
+                    //2.兄弟有借,兄弟节点有子节点
+                } else {
+                    //兄弟节点没有右节点，兄、兄左换色，兄右旋
+                    if (brother.left == null){
+                        brother.color = RED;
+                        brother.right.color = BLACK;
+                        leftRotate(brother);
+                        brother = parent.left;
+                    }
+                    brother.color = parent.color;
+                    parent.color = BLACK;
+                    brother.left.color = BLACK;
+                    rightRotate(parent);
+                    node = root;
+                }
+            }
+        }
+        //情况3，补充
+        root.color = BLACK;
+    }
+
+    /**
+     * 1.删除为红，直接删除
+     * 2.删除为黑(因交换删除法，实际删除节点，有且只有一个子节点)
+     *      1.有子节点，父为黑，子必为红，子节点改黑，替换父节点
+     *      2.无子节点
+     *          1.兄为红，兄改黑，兄左改红（右），父左旋
+     *          2.兄为黑
+     *              1.兄有两个节点，必为红(兄改父颜色，父、兄右改黑，父左旋)
+     *              2.兄有且只有右节点，必为红(可同1，判断父色，父为红，左旋;父为黑，兄右改黑，父左旋)
+     *              3.兄有且只有左节点，必为红(父为黑，兄改黑，兄右旋，父左旋;父为红，父改黑,兄右旋，父左旋)（兄和兄左互换颜色，兄右旋，在经过1）
+     *              4.兄无节点，删除，兄改红，向上循环，父为红或跟节点，按情况调整
+     * @param
+     */
+    /*
+    //删除修复方法
+    private void deleteLeafFix(Node5 node) {
+        if (node.color == BLACK){
+            Node5 parent = parentOf(node);
+
+            Node5 t = node.left == null ? node.right : node.left;
+            //2.1.有子节点，父为黑，子必为红，子节点改黑，替换父节点
+            if (t != null){
+                t.color = BLACK;
+            //2.无子节点
+            } else {
+                //删除节点是父节点的左子节点
+                if (parent.left == node){
+                    Node5 brother =parent.right;
+                    //1.兄为红，兄改黑，兄左改红（右），父左旋
+                    if (brother.color == RED){
+                        brother.color = BLACK;
+                        brother.left.color = RED;
+                        leftRotate(parent);
+                    //2.兄为黑
+                    } else {
+                        //3.兄有且只有左节点，必为红(父为黑，兄改黑，兄右旋，父左旋;父为红，父改黑,兄右旋，父左旋)（兄和兄左互换颜色，兄右旋，在经过1）
+                        if (brother.left != null && brother.right == null){
+                            brother.color = RED;
+                            brother.left.color = BLACK;
+                            rightRotate(brother);
+                        }
+                        //1.兄有两个节点，必为红(兄改父颜色，父、兄右改黑，父左旋)
+                        //2.兄有且只有右节点，必为红(可同1，判断父色，父为红，左旋;父为黑，兄右改黑，父左旋)
+                        if ((brother.left != null && brother.right != null) || brother.right != null){
+                            brother.color = parent.color;
+                            parent.color = brother.right.color = BLACK;
+                            leftRotate(parent);
+                        //4.兄无节点，删除，兄改红，父为删除节点递归
+                        }else {
+
+                        }
+                    }
+                }else {
+                    Node5 brother =parent.left;
+                }
+            }
+        }
+    }*/
+
+
+
+
+    static class Node5{
         private int key;//权值
         private Node5 left;//左节点
         private Node5 right;//右节点
