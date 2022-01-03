@@ -10,6 +10,11 @@ import java.util.Scanner;
  *     https://blog.csdn.net/victoryyounger/article/details/112109261?ops_request_misc=&request_id=&biz_id=102&utm_term=%E7%BA%A2%E9%BB%91%E6%A0%91%E5%88%A0%E9%99%A4java&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduweb~default-4-112109261.nonecase&spm=1018.2226.3001.4187
  * 增加已完成
  *      TreeOperation.java
+ * 2022.1.3增加
+ *      1.删除节点修复时BUG(当兄弟节点为黑，且没有子节点的情况下，父节点的父节点为红，直接变色破坏红黑树原则)
+ *      2.修改为，旋转红色节点(如此修改会触发，兄弟节点没有子节点，父节点为红情况下，会出现父子为红BUG)
+ *      3.添加，旋转红色节点后，红色节点的父节点变黑，(如此不破坏红黑树，即情况1，旋转红色节点后的父节点本身为黑，情况2，父子为红，父变黑也可解决)
+ *
  *
  * 左旋转、右旋转，记得改颜色
  */
@@ -304,7 +309,7 @@ class RedBlackTree{
      *      2.RR、LL（兄、父、兄左变色，父旋转）
      *  3.兄弟节点不借(兄弟节点没有子节点)
      *          兄弟节点变红，从父节点开始循环
-     *              1.父节点有红，红变黑
+     *              1.父节点有红，旋转当前节点
      *              2.父节点没有红，跟节点的兄弟节点黑减1(跟节点、兄弟节点变色，跟节点旋转)
      * @param node
      */
@@ -333,11 +338,13 @@ class RedBlackTree{
                     if (node == root){
                         node.color = RED;
                         leftRotate(node);
-                    //红色节点，变黑色
                     } else {
-                        node.color = BLACK;
+                        //有红色节点,旋转红色节点,旋转后红色节点的父节点变黑
+                        leftRotate(node);
+                        node.parent.color = BLACK;
                         node = root;
                     }
+
                 //2.兄弟有借,兄弟节点有子节点
                 } else {
                     //兄弟节点没有右节点，兄、兄左换色，兄右旋
@@ -377,7 +384,9 @@ class RedBlackTree{
                         rightRotate(node);
                         //红色节点，变黑色
                     } else {
-                        node.color = BLACK;
+                        //有红色节点,旋转红色节点,旋转后红色节点的父节点变黑
+                        rightRotate(node);
+                        node.parent.color = BLACK;
                         node = root;
                     }
                     //2.兄弟有借,兄弟节点有子节点
